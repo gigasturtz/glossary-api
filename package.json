@@ -1,0 +1,23 @@
+{
+  "name": "glossary-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gigasturtz/glossary-api.git"
+  },
+  "author": "Nick Sturtzel",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/gigasturtz/glossary-api/issues"
+  },
+  "homepage": "https://github.com/gigasturtz/glossary-api#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "serverless-http": "^2.7.0"
+  }
+}
