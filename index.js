@@ -1,14 +1,12 @@
 // index.js
 
-const https = require('https');
-
 const serverless = require('serverless-http');
 
 const express = require('express')
 
-const app = express()
+const searchForTerm = require('./searchForTerm')
 
-const terms = require('./terms.json')
+const app = express()
 
 const toTitleCase = (str) => {
     if(str){
@@ -62,16 +60,17 @@ function doDefFormatting(str) {
 }
 
 app.get('/', function (req, res) {
-    const correctedTerm = toTitleCase(req.query.search)
-    let searchedTerm = terms.find(element => element.term === correctedTerm)
-    if (searchedTerm){
+    let searchedTerm = searchForTerm(req.query.search)
+    try{
         let processedTerm = {};
-        processedTerm.glossaryLink = glossaryLink(correctedTerm)
-        processedTerm.def = doDefFormatting(searchedTerm.def)
-        processedTerm.term = searchedTerm.term
+        processedTerm.glossaryLink = glossaryLink(searchedTerm[0].term)
+        processedTerm.def = doDefFormatting(searchedTerm[0].def)
+        processedTerm.term = searchedTerm[0].term
         res.send(processedTerm)
     }
-    res.send("No results!")
+    catch(err) {
+    res.send({ term: req.query.search, def: "No results found!", glossaryLink: "Try browsing the glossary to find what you're looking for... https://glossary.infil.net"})
+    }
 })
 
 module.exports.handler = serverless(app);
