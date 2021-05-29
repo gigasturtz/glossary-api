@@ -8,34 +8,40 @@ const express = require('express')
 
 const app = express()
 
+const terms = require('./terms.json')
+
+const toTitleCase = (str) => {
+    if(str){
+        return str.replace(
+          /\w\S*/g,
+          function(txt) {
+            return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+        }
+        );
+    }
+    return "";
+}
+
+const glossaryLink = (str) => {
+    return `for more information visit https://glossary.infil.net/?t=${str}`
+}
+
+const trimmedDef = (str) => {
+    return `${str.substring(0,199)}...`
+}
 
 app.get('/', function (req, res) {
-    let data = '';
-    let get_results = new Promise((resolve, reject) => {
-        https.get('https://glossary.infil.net/json/glossary.json', (resp) => {
-            resp.on('data', (chunk) => {
-              data += chunk;
-            });
-
-            resp.on('end', () => {
-                results = JSON.parse(data);
-                resolve(results);
-            });
-
-            resp.on('error', (error) => {
-                reject(error);
-            });
-        })
-    })
-
-    get_results.then((response) => {
-        const searchedTerm = response.find(element => element.term === req.query.search)
-        res.send(searchedTerm)
-    }).catch((error) => {
-        console.log(error);
-    });
+    const correctedTerm = toTitleCase(req.query.search)
+    let searchedTerm = terms.find(element => element.term === correctedTerm)
+    if (searchedTerm){
+        let processedTerm = {};
+        processedTerm.glossaryLink = glossaryLink(correctedTerm)
+        processedTerm.def = trimmedDef(searchedTerm.def)
+        processedTerm.term = searchedTerm.term
+        res.send(processedTerm)
+    }
+    res.send("No results!")
 })
-
 
 module.exports.handler = serverless(app);
 
